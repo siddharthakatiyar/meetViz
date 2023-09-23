@@ -33,11 +33,11 @@ const RoomPage = () => {
   }, [myStream]);
 
 
-  const toggleMic = useCallback(async () => {
-    const audioTrack = myStream.getAudioTracks()[0];
-    audioTrack.enabled = !audioTrack.enabled;
-    console.log(audioTrack.enabled);
-  }, [myStream]);
+  // const toggleMic = useCallback(async () => {
+  //   const audioTrack = myStream.getAudioTracks()[0];
+  //   audioTrack.enabled = !audioTrack.enabled;
+  //   console.log(audioTrack.enabled);
+  // }, [myStream]);
 
   const handleIncommingCall = useCallback(
     async ({ from, offer }) => {
@@ -127,7 +127,7 @@ const RoomPage = () => {
         {myStream && <button onClick={sendStreams} className="btn send">Send Stream</button>}
         {remoteSocketId && <button className="btn call" onClick={handleCallUser}>CALL</button>}
         <button className="btn cam" onClick={toggleCamera}>Camera</button>
-        <button className="btn mic" onClick={toggleMic}>Mic</button>
+        {/* <button className="btn mic" onClick={toggleMic}>Mic</button> */}
         <Container className="streams">
           {myStream && (
             <>
