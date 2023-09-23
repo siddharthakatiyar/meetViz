@@ -2,6 +2,8 @@ import React, { useEffect, useCallback, useState } from "react";
 import ReactPlayer from "react-player";
 import peer from "../service/peer";
 import { useSocket } from "../context/SocketProvider";
+import Container from '@mui/material/Container';
+import './room.css';
 
 const RoomPage = () => {
   const socket = useSocket();
@@ -110,35 +112,42 @@ const RoomPage = () => {
   ]);
 
   return (
-    <div>
-      <h1>Room Page</h1>
-      <h4>{remoteSocketId ? "Connected" : "No one in room"}</h4>
-      {myStream && <button onClick={sendStreams}>Send Stream</button>}
-      {remoteSocketId && <button onClick={handleCallUser}>CALL</button>}
-      {myStream && (
-        <>
-          <h1>My Stream</h1>
-          <ReactPlayer
-            playing
-            muted
-            height="100px"
-            width="200px"
-            url={myStream}
-          />
-        </>
-      )}
-      {remoteStream && (
-        <>
-          <h1>Remote Stream</h1>
-          <ReactPlayer
-            playing
-            muted
-            height="100px"
-            width="200px"
-            url={remoteStream}
-          />
-        </>
-      )}
+    <div class="outer-wrapper">
+      <Container className="inner-wrapper">
+        <h1>Vaarta Room</h1>
+       {remoteSocketId ? <h4 className="connected"> Connected</h4> : <h4>No one in room</h4>}
+        {myStream && <button onClick={sendStreams} className="btn send">Send Stream</button>}
+        {remoteSocketId && <button className="btn call" onClick={handleCallUser}>CALL</button>}
+        <Container className="streams">
+          {myStream && (
+            <>
+              {/* <h1>My Stream</h1> */}
+              <ReactPlayer
+                playing
+                muted
+                height="100px"
+                width="200px"
+                url={myStream}
+                className="stream"
+              />
+            </>
+          )}
+          {remoteStream && (
+            <>
+              {/* <h1>Remote Stream</h1> */}
+              <ReactPlayer
+                playing
+                muted
+                height="100px"
+                width="200px"
+                url={remoteStream}
+                className="stream"
+
+              />
+            </>
+          )}
+        </Container>
+      </Container>
     </div>
   );
 };
