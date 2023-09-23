@@ -26,14 +26,22 @@ const RoomPage = () => {
     setMyStream(stream);
   }, [remoteSocketId, socket]);
 
+  const toggleCamera = useCallback(async () => {
+    const videoTrack = myStream.getVideoTracks()[0];
+    videoTrack.enabled = !videoTrack.enabled;
+    console.log(videoTrack.enabled);
+  }, [myStream]);
+
+
+  const toggleMic = useCallback(async () => {
+    const audioTrack = myStream.getAudioTracks()[0];
+    audioTrack.enabled = !audioTrack.enabled;
+    console.log(audioTrack.enabled);
+  }, [myStream]);
+
   const handleIncommingCall = useCallback(
     async ({ from, offer }) => {
       setRemoteSocketId(from);
-      const stream = await navigator.mediaDevices.getUserMedia({
-        audio: true,
-        video: true,
-      });
-      setMyStream(stream);
       console.log(`Incoming Call`, from, offer);
       const ans = await peer.getAnswer(offer);
       socket.emit("call:accepted", { to: from, ans });
@@ -115,9 +123,11 @@ const RoomPage = () => {
     <div class="outer-wrapper">
       <Container className="inner-wrapper">
         <h1>Vaarta Room</h1>
-       {remoteSocketId ? <h4 className="connected"> Connected</h4> : <h4>No one in room</h4>}
+        {remoteSocketId ? <h4 className="connected"> Connected</h4> : <h4>No one in room</h4>}
         {myStream && <button onClick={sendStreams} className="btn send">Send Stream</button>}
         {remoteSocketId && <button className="btn call" onClick={handleCallUser}>CALL</button>}
+        <button className="btn cam" onClick={toggleCamera}>Camera</button>
+        <button className="btn mic" onClick={toggleMic}>Mic</button>
         <Container className="streams">
           {myStream && (
             <>
@@ -142,7 +152,6 @@ const RoomPage = () => {
                 width="200px"
                 url={remoteStream}
                 className="stream"
-
               />
             </>
           )}
