@@ -3,6 +3,7 @@ import ReactPlayer from "react-player";
 import peer from "../service/peer";
 import { useSocket } from "../context/SocketProvider";
 import Container from '@mui/material/Container';
+import CameraAltIcon from '@mui/icons-material/CameraAlt';
 import './room.css';
 
 const RoomPage = () => {
@@ -123,7 +124,7 @@ const RoomPage = () => {
         {remoteSocketId ? <h4 className="connected"> Connected</h4> : <h4>No one in the room</h4>}
         {myStream && <button onClick={sendStreams} className="btn send">Send Stream</button>}
         {remoteSocketId && <button className="btn call" onClick={handleCallUser}>CALL</button>}
-        {myStream && <button className="btn toggle" onClick={toggleCamera}>Toggle Camera</button>}
+        {myStream && <CameraAltIcon/>}
         <div className="streams" style={{ display: "flex" }}>
           {myStream && (
             <div className="stream-wrapper" style={{ flex: 1, marginRight: "10px" }}>
