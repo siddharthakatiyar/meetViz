@@ -124,7 +124,7 @@ const RoomPage = () => {
         {remoteSocketId ? <h4 className="connected"> Connected</h4> : <h4>No one in the room</h4>}
         {myStream && <button onClick={sendStreams} className="btn send">Send Stream</button>}
         {remoteSocketId && <button className="btn call" onClick={handleCallUser}>CALL</button>}
-        {myStream && <button className="toggle" onClick={toggleCamera}><CameraAltIcon/></button>}
+        {myStream && <CameraAltIcon/>}
         <div className="streams" style={{ display: "flex" }}>
           {myStream && (
             <div className="stream-wrapper" style={{ flex: 1, marginRight: "10px" }}>
