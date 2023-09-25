@@ -1,4 +1,11 @@
 # Vaarta
+A personalized secure online meeting platform for AICTE
+
+### Technology used
+
+- Backend - Node.js
+- Frontend - React.js
+- Framework - webRTC
 
 **Setting up on a Local Machine**
 1. Clone the repository.
