@@ -4,7 +4,6 @@ import { useSocket } from "../context/SocketProvider";
 import Container from '@mui/material/Container';
 import Box from '@mui/material/Box';
 import './lobby.css';
-import logo from "../aicte.png";
 
 const LobbyScreen = () => {
   const [email, setEmail] = useState("");
@@ -48,8 +47,7 @@ const LobbyScreen = () => {
       }}>
         <Container className="wrapper">
           <Container className="header">
-            <img src={logo} alt="logo" className="logo"/>
-            <h2 className="name">Vaarta</h2>
+            <h2 className="name">eVaarta</h2>
           </Container>
           <Container>
             <h1 className="lobby-head">LOBBY</h1>

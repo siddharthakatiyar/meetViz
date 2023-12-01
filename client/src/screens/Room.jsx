@@ -4,6 +4,7 @@ import peer from "../service/peer";
 import { useSocket } from "../context/SocketProvider";
 import Container from '@mui/material/Container';
 import CameraAltIcon from '@mui/icons-material/CameraAlt';
+import MicIcon from '@mui/icons-material/Mic';
 import './room.css';
 
 const RoomPage = () => {
@@ -19,10 +20,9 @@ const RoomPage = () => {
   };
 
   const handleSendMessage = () => {
-    // Emit the message to other peers or the server
     socket.emit("chat:message", { to: remoteSocketId, message });
     setChatHistory([...chatHistory, { sender: "Me", message }]);
-    setMessage(""); // Clear the input field after sending
+    setMessage(""); 
   };
 
   useEffect(() => {
@@ -60,6 +60,11 @@ const RoomPage = () => {
     videoTrack.enabled = !videoTrack.enabled;
   }, [myStream]);
 
+  const toggleMic = useCallback(async () => {
+    const audioTrack = myStream.getAudioTracks()[0];
+    audioTrack.enabled = !audioTrack.enabled;
+  }, [myStream]);
+
   const handleIncommingCall = useCallback(
     async ({ from, offer }) => {
       setRemoteSocketId(from);
@@ -95,11 +100,11 @@ const RoomPage = () => {
     socket.emit("peer:nego:needed", { offer, to: remoteSocketId });
   }, [remoteSocketId, socket]);
 
-  const sendICECandidate = useCallback(async (event) => {
-    if (event.candidate) {
-      socket.emit("peer:ice", { to: remoteSocketId, candidate: event.candidate });
-    }
-  }, [socket, remoteSocketId]);
+  // const sendICECandidate = useCallback(async (event) => {
+  //   if (event.candidate) {
+  //     socket.emit("peer:ice", { to: remoteSocketId, candidate: event.candidate });
+  //   }
+  // }, [socket, remoteSocketId]);
 
   useEffect(() => {
     peer.peer.addEventListener("negotiationneeded", handleNegoNeeded);
@@ -169,12 +174,12 @@ const RoomPage = () => {
         {myStream && <button onClick={sendStreams} className="btn send">Send Stream</button>}
         {remoteSocketId && <button className="btn call" onClick={handleCallUser}>CALL</button>}
         {myStream && <button className="btn call" onClick={toggleCamera}><CameraAltIcon /></button>}
+        {myStream && <button className="btn call" onClick={toggleMic}><MicIcon /></button>}
         <div className="streams" style={{ display: "flex" }}>
           {myStream && (
             <div className="stream-wrapper" style={{ flex: 1, marginRight: "10px" }}>
               <ReactPlayer
                 playing
-                // muted
                 height="100%"
                 url={myStream}
                 className="stream"
@@ -186,7 +191,6 @@ const RoomPage = () => {
             <div className="stream-wrapper" style={{ flex: 1 }}>
               <ReactPlayer
                 playing
-                // muted
                 height="100%"
                 url={remoteStream}
                 className="stream"
@@ -196,7 +200,8 @@ const RoomPage = () => {
           )}
         </div>
       </Container>
-      <div className="chatbox">
+      {remoteStream && (
+        <div className="chatbox">
         <div className="chat-history">
           {chatHistory.map((item, index) => (
             <div key={index}>
@@ -214,6 +219,7 @@ const RoomPage = () => {
           <button onClick={handleSendMessage}>Send</button>
         </div>
       </div>
+      )}
     </div>
 
   );
