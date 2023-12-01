@@ -9,6 +9,11 @@ class PeerService {
               "stun:global.stun.twilio.com:3478",
             ],
           },
+          {
+            'urls':'turn:192.168.1.45:3478',
+            'username': 'siddhartha',
+            'credential': 'password',
+          },
         ],
       });
     }

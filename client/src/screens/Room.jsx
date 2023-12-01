@@ -11,6 +11,34 @@ const RoomPage = () => {
   const [remoteSocketId, setRemoteSocketId] = useState(null);
   const [myStream, setMyStream] = useState();
   const [remoteStream, setRemoteStream] = useState();
+  const [message, setMessage] = useState("");
+  const [chatHistory, setChatHistory] = useState([]);
+
+  const handleMessageChange = (event) => {
+    setMessage(event.target.value);
+  };
+
+  const handleSendMessage = () => {
+    // Emit the message to other peers or the server
+    socket.emit("chat:message", { to: remoteSocketId, message });
+    setChatHistory([...chatHistory, { sender: "Me", message }]);
+    setMessage(""); // Clear the input field after sending
+  };
+
+  useEffect(() => {
+    socket.on("chat:message", ({ sender, message }) => {
+      setChatHistory((prevChatHistory) => [
+        ...prevChatHistory,
+        { sender, message },
+      ]);
+      console.log(`Message from ${sender}: ${message}`);
+    });
+  
+    return () => {
+      socket.off("chat:message");
+    };
+  }, [socket]);
+  
 
   const handleUserJoined = useCallback(({ email, id }) => {
     console.log(`Email ${email} joined room`);
@@ -35,11 +63,11 @@ const RoomPage = () => {
   const handleIncommingCall = useCallback(
     async ({ from, offer }) => {
       setRemoteSocketId(from);
-      // const stream = await navigator.mediaDevices.getUserMedia({
-      //   audio: true,
-      //   video: true,
-      // });
-      // setMyStream(stream);
+      const stream = await navigator.mediaDevices.getUserMedia({
+        audio: true,
+        video: true,
+      });
+      setMyStream(stream);
       console.log(`Incoming Call`, from, offer);
       const ans = await peer.getAnswer(offer);
       socket.emit("call:accepted", { to: from, ans });
@@ -67,6 +95,12 @@ const RoomPage = () => {
     socket.emit("peer:nego:needed", { offer, to: remoteSocketId });
   }, [remoteSocketId, socket]);
 
+  const sendICECandidate = useCallback(async (event) => {
+    if (event.candidate) {
+      socket.emit("peer:ice", { to: remoteSocketId, candidate: event.candidate });
+    }
+  }, [socket, remoteSocketId]);
+
   useEffect(() => {
     peer.peer.addEventListener("negotiationneeded", handleNegoNeeded);
     return () => {
@@ -93,6 +127,16 @@ const RoomPage = () => {
       setRemoteStream(remoteStream[0]);
     });
   }, []);
+
+  useEffect(() => {
+    socket.on("peer:ice", (data) => {
+      const { candidate } = data;
+      peer.peer.addIceCandidate(candidate);
+    });
+    return () => {
+      socket.off("peer:ice");
+    };
+  }, [socket]);
 
   useEffect(() => {
     socket.on("user:joined", handleUserJoined);
@@ -124,13 +168,13 @@ const RoomPage = () => {
         {remoteSocketId ? <h4 className="connected"> Connected</h4> : <h4>No one in the room</h4>}
         {myStream && <button onClick={sendStreams} className="btn send">Send Stream</button>}
         {remoteSocketId && <button className="btn call" onClick={handleCallUser}>CALL</button>}
-        {myStream && <button className="btn call" onClick={toggleCamera}><CameraAltIcon/></button>}
+        {myStream && <button className="btn call" onClick={toggleCamera}><CameraAltIcon /></button>}
         <div className="streams" style={{ display: "flex" }}>
           {myStream && (
             <div className="stream-wrapper" style={{ flex: 1, marginRight: "10px" }}>
               <ReactPlayer
                 playing
-                muted
+                // muted
                 height="100%"
                 url={myStream}
                 className="stream"
@@ -142,7 +186,7 @@ const RoomPage = () => {
             <div className="stream-wrapper" style={{ flex: 1 }}>
               <ReactPlayer
                 playing
-                muted
+                // muted
                 height="100%"
                 url={remoteStream}
                 className="stream"
@@ -152,9 +196,28 @@ const RoomPage = () => {
           )}
         </div>
       </Container>
+      <div className="chatbox">
+        <div className="chat-history">
+          {chatHistory.map((item, index) => (
+            <div key={index}>
+              <strong>{item.sender}:</strong> {item.message}
+            </div>
+          ))}
+        </div>
+        <div className="chat-input">
+          <input
+            type="text"
+            value={message}
+            onChange={handleMessageChange}
+            placeholder="Type your message..."
+          />
+          <button onClick={handleSendMessage}>Send</button>
+        </div>
+      </div>
     </div>
+
   );
-  
+
 };
 
 export default RoomPage;
